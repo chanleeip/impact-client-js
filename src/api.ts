@@ -19,7 +19,9 @@ import {
     ExperimentTrajectories,
     WorkspaceDefinition,
     WorkspaceId,
+    ProjectId
 } from './types'
+import { get } from 'http'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importModule(moduleName: string): Promise<any> {
@@ -31,8 +33,7 @@ interface AxiosConfig {
     jar?: CookieJar
 }
 
-const isNode = () => typeof window === 'undefined'
-
+const isNode = () => typeof window === 'undefined' 
 const getCookieValue = (key: string) => {
     const parts = `; ${document.cookie}`.split(`; ${key}=`)
 
@@ -63,13 +64,13 @@ const toApiError = (e: AxiosError | Error) => {
 }
 
 class Api {
-    private axios!: AxiosInstance
-    private axiosConfig!: AxiosConfig
+    private axios!: AxiosInstance 
+    private axiosConfig!: AxiosConfig 
     private baseUrl: string
     private impactApiKey?: string
     private impactToken?: string
-    private jhToken: string
-    private jhUserPath: string | undefined
+    private jhToken: string    
+    private jhUserPath: string | undefined                
 
     private configureAxios() {
         const headers: Record<string, string> = {
@@ -81,14 +82,13 @@ class Api {
         this.axiosConfig = { headers }
         this.axios = Axios.create(this.axiosConfig)
     }
-
     private constructor({
         impactApiKey,
         impactToken,
         jupyterHubToken,
         serverAddress,
         jupyterHubUserPath,
-    }: {
+}:{
         impactApiKey?: string
         impactToken?: string
         jupyterHubToken: string
@@ -249,10 +249,10 @@ class Api {
             `${this.baseUrl}${this.jhUserPath}impact/api/login`,
             { secretKey: this.impactApiKey }
         )
-        // extract cookie value, set cookie
+       
         const nodeCookieJar = this.getNodeCookieJar()
         if (nodeCookieJar) {
-            // Get cookie value from cookiejar
+           
             const cookies = await nodeCookieJar.getCookies(
                 `${this.baseUrl}${this.jhUserPath}`
             )
@@ -260,7 +260,7 @@ class Api {
         } else {
             this.impactToken = getCookieValue('access_token')
         }
-        // Update axios config with the acquired impactToken
+   
         await this.ensureAxiosConfig()
     }
 
@@ -278,6 +278,100 @@ class Api {
                 .catch((e) => reject(toApiError(e)))
         })
     }
+    getWorkSpace = async ({
+        workspaceId,
+    }: {
+        workspaceId: WorkspaceId
+    }): Promise<ExperimentDefinition[]> => {
+        return new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+            .then(() => {
+                this.axios
+                    .get(
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}`
+                    )
+                    .then((response) => resolve(response.data?.definition))
+                    .catch((e) => reject(toApiError(e)))
+            })
+            .catch((e) => reject(toApiError(e)))
+    })
+    }
+    getWorkspaceProjects= async ({
+        workspaceId,
+    }: {
+        workspaceId: WorkspaceId
+    }): Promise<ExperimentDefinition[]> => {
+        return new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+            .then(() => {
+                this.axios
+                    .get(
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/projects`
+                    )
+                    .then((response) => resolve(response.data))
+                    .catch((e) => reject(toApiError(e)))
+            })
+            .catch((e) => reject(toApiError(e)))
+    })
+    }
+    getWorkspaceProjectExperiments= async ({
+        workspaceId,
+        projectId,
+    }: {
+        workspaceId: WorkspaceId,
+        projectId: ProjectId
+    }): Promise<ExperimentDefinition[]> => {
+        return new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+            .then(() => {
+                this.axios
+                    .get(
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/projects/${projectId}/experiments`
+                    )
+                    .then((response) => resolve(response.data))
+                    .catch((e) => reject(toApiError(e)))
+            })
+            .catch((e) => reject(toApiError(e)))
+    })
+    }
+    getExperimentsMetaData = async ({
+        workspaceId,
+    }: {
+        workspaceId: WorkspaceId
+    }): Promise<ExperimentDefinition[]> => {
+        return new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+            .then(() => {
+                this.axios
+                    .get(
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/experiments`
+                    )
+                    .then((response) => resolve(response.data))
+                    .catch((e) => reject(toApiError(e)))
+            })
+            .catch((e) => reject(toApiError(e)))
+    })
+}
+getVariables = async ({
+    workspaceId,
+    experimentId,
+}: {
+    workspaceId: WorkspaceId,
+    experimentId: ExperimentId
+}): Promise<ExperimentDefinition[]> => {
+    return new Promise((resolve, reject) => {
+        this.ensureImpactToken()
+        .then(() => {
+            this.axios
+                .get(   
+                    `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/experiments/${experimentId}/variables`
+                )
+                .then((response) => resolve(response.data))
+                .catch((e) => reject(toApiError(e)))
+        })
+        .catch((e) => reject(toApiError(e)))
+})
+}
 
     createExperiment = async ({
         experimentDefinition,
