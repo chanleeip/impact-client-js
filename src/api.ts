@@ -20,6 +20,7 @@ import {
     WorkspaceDefinition,
     WorkspaceId,
 } from './types'
+import { get } from 'http'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function importModule(moduleName: string): Promise<any> {
@@ -333,7 +334,22 @@ class Api {
             })
             .catch((e) => reject(toApiError(e)))
     })
-    }
+}
+getVariables = async (param1:string,param2:string): Promise<ExperimentDefinition[]> => {
+    return new Promise((resolve, reject) => {
+        this.ensureImpactToken()
+        .then(() => {
+            this.axios
+                .get(   
+                    `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param1}/experiments/${param2}/variables`
+                )
+                .then((response) => resolve(response.data))
+                .catch((e) => reject(toApiError(e)))
+        })
+        .catch((e) => reject(toApiError(e)))
+})
+}
+
     createExperiment = async ({
         experimentDefinition,
         workspaceId,
