@@ -31,7 +31,7 @@ interface AxiosConfig {
     jar?: CookieJar
 }
 
-const isNode = () => typeof window === 'undefined'
+const isNode = () => typeof window === 'undefined' //true if window is undefined(only in node.js)else false(only in browser)
 
 const getCookieValue = (key: string) => {
     const parts = `; ${document.cookie}`.split(`; ${key}=`)
@@ -63,13 +63,13 @@ const toApiError = (e: AxiosError | Error) => {
 }
 
 class Api {
-    private axios!: AxiosInstance
-    private axiosConfig!: AxiosConfig
-    private baseUrl: string
-    private impactApiKey?: string
-    private impactToken?: string
-    private jhToken: string
-    private jhUserPath: string | undefined
+    private axios!: AxiosInstance // cannnot be null    --- used for calling axios methods
+    private axiosConfig!: AxiosConfig // cannnot be null --- used for configuring axios instance like adding headers, cookies etc
+    private baseUrl: string// server address
+    private impactApiKey?: string// can be null  ---api key
+    private impactToken?: string// can be null         --- impact token
+    private jhToken: string    //                      --- jupyter hub token
+    private jhUserPath: string | undefined                // jupyter hub user path
 
     private configureAxios() {
         const headers: Record<string, string> = {
@@ -81,14 +81,14 @@ class Api {
         this.axiosConfig = { headers }
         this.axios = Axios.create(this.axiosConfig)
     }
-
-    private constructor({
+//configure Axios => declares headers object with Authorization and  Impact-Authorization keys (if impactToken is not null) which is then used to create axios instance
+    private constructor({//destructuring object
         impactApiKey,
         impactToken,
         jupyterHubToken,
         serverAddress,
         jupyterHubUserPath,
-    }: {
+}:{
         impactApiKey?: string
         impactToken?: string
         jupyterHubToken: string
@@ -155,22 +155,22 @@ class Api {
         })
     }
 
-    private isConfiguredForNode = () => !!this.axiosConfig.jar
+    private isConfiguredForNode = () => !!this.axiosConfig.jar//returns true if jar is not null else false
 
     private isConfiguredForImpact = () =>
-        !!this.axiosConfig.headers['Impact-Authorization']
+        !!this.axiosConfig.headers['Impact-Authorization']//returns true if Impact-Authorization is not null else false
 
     private getNodeCookieJar = () => this.axiosConfig.jar
 
     private ensureAxiosConfig = async () => {
         if (isNode()) {
             if (
-                !this.isConfiguredForNode() ||
-                (this.impactToken && !this.isConfiguredForImpact())
+                !this.isConfiguredForNode() ||//returns true if jar is null
+                (this.impactToken && !this.isConfiguredForImpact())//returns true if Impact-Authorization is null 
             ) {
                 const AxiosCookieSupport = await importModule(
                     'axios-cookiejar-support'
-                )
+                )//
                 const ToughCookie = await importModule('tough-cookie')
 
                 const jar = new ToughCookie.CookieJar(
@@ -196,7 +196,7 @@ class Api {
                 )
             }
         } else {
-            if (this.impactToken && !this.isConfiguredForImpact()) {
+            if (this.impactToken && !this.isConfiguredForImpact()) {//returns true if Impact-Authorization is null
                 const headers: Record<string, string> = {
                     Authorization: `token ${this.jhToken}`,
                     'Impact-Authorization': `Bearer ${this.impactToken}`,
