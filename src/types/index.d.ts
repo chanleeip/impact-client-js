@@ -32,3 +32,4 @@ export type ExperimentTrajectories =
 export type CaseId = string
 export type ExperimentId = string
 export type WorkspaceId = string
+export type ProjectId  = string

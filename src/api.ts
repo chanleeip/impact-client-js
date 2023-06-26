@@ -19,6 +19,7 @@ import {
     ExperimentTrajectories,
     WorkspaceDefinition,
     WorkspaceId,
+    ProjectId
 } from './types'
 import { get } from 'http'
 
@@ -279,13 +280,17 @@ class Api {
                 .catch((e) => reject(toApiError(e)))
         })
     }
-    getWorkSpacesID = async (param:string): Promise<ExperimentDefinition[]> => {
+    getWorkSpacesID = async ({
+        workspaceId,
+    }: {
+        workspaceId: WorkspaceId
+    }): Promise<ExperimentDefinition[]> => {
         return new Promise((resolve, reject) => {
             this.ensureImpactToken()
             .then(() => {
                 this.axios
                     .get(
-                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param}`
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}`
                     )
                     .then((response) => resolve(response.data?.definition))
                     .catch((e) => reject(toApiError(e)))
@@ -293,13 +298,17 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
     }
-    getWorkspaceProjects= async (param:string): Promise<ExperimentDefinition[]> => {
+    getWorkspaceProjects= async ({
+        workspaceId,
+    }: {
+        workspaceId: WorkspaceId
+    }): Promise<ExperimentDefinition[]> => {
         return new Promise((resolve, reject) => {
             this.ensureImpactToken()
             .then(() => {
                 this.axios
                     .get(
-                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param}/projects`
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/projects`
                     )
                     .then((response) => resolve(response.data))
                     .catch((e) => reject(toApiError(e)))
@@ -307,13 +316,19 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
     }
-    getWorkspaceProjectExperiments= async (param1:string,param2:string): Promise<ExperimentDefinition[]> => {
+    getWorkspaceProjectExperiments= async ({
+        workspaceId,
+        projectId,
+    }: {
+        workspaceId: WorkspaceId,
+        projectId: ProjectId
+    }): Promise<ExperimentDefinition[]> => {
         return new Promise((resolve, reject) => {
             this.ensureImpactToken()
             .then(() => {
                 this.axios
                     .get(
-                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param1}/projects/${param2}/experiments`
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/projects/${projectId}/experiments`
                     )
                     .then((response) => resolve(response.data))
                     .catch((e) => reject(toApiError(e)))
@@ -321,13 +336,17 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
     }
-    getExperimentsMetaData = async (param1:string): Promise<ExperimentDefinition[]> => {
+    getExperimentsMetaData = async ({
+        workspaceId,
+    }: {
+        workspaceId: WorkspaceId
+    }): Promise<ExperimentDefinition[]> => {
         return new Promise((resolve, reject) => {
             this.ensureImpactToken()
             .then(() => {
                 this.axios
                     .get(
-                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param1}/experiments`
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/experiments`
                     )
                     .then((response) => resolve(response.data))
                     .catch((e) => reject(toApiError(e)))
@@ -335,13 +354,19 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
 }
-getVariables = async (param1:string,param2:string): Promise<ExperimentDefinition[]> => {
+getVariables = async ({
+    workspaceId,
+    experimentId,
+}: {
+    workspaceId: WorkspaceId,
+    experimentId: ExperimentId
+}): Promise<ExperimentDefinition[]> => {
     return new Promise((resolve, reject) => {
         this.ensureImpactToken()
         .then(() => {
             this.axios
                 .get(   
-                    `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param1}/experiments/${param2}/variables`
+                    `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/experiments/${experimentId}/variables`
                 )
                 .then((response) => resolve(response.data))
                 .catch((e) => reject(toApiError(e)))
