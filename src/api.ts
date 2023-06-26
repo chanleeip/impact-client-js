@@ -306,6 +306,20 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
     }
+    getWorkspaceProjectExperiments= async (param1:string,param2:string): Promise<ExperimentDefinition[]> => {
+        return new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+            .then(() => {
+                this.axios
+                    .get(
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param1}/projects/${param2}/experiments`
+                    )
+                    .then((response) => resolve(response.data))
+                    .catch((e) => reject(toApiError(e)))
+            })
+            .catch((e) => reject(toApiError(e)))
+    })
+    }
     createExperiment = async ({
         experimentDefinition,
         workspaceId,
