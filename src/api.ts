@@ -320,6 +320,20 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
     }
+    getExperimentsMetaData = async (param1:string): Promise<ExperimentDefinition[]> => {
+        return new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+            .then(() => {
+                this.axios
+                    .get(
+                        `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${param1}/experiments`
+                    )
+                    .then((response) => resolve(response.data))
+                    .catch((e) => reject(toApiError(e)))
+            })
+            .catch((e) => reject(toApiError(e)))
+    })
+    }
     createExperiment = async ({
         experimentDefinition,
         workspaceId,
