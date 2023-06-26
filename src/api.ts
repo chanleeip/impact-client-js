@@ -278,7 +278,7 @@ class Api {
                 .catch((e) => reject(toApiError(e)))
         })
     }
-    getWorkSpacesID = async ({
+    getWorkSpace = async ({
         workspaceId,
     }: {
         workspaceId: WorkspaceId
