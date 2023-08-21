@@ -334,6 +334,26 @@ class Api {
             .catch((e) => reject(toApiError(e)))
     })
     }
+     getWorkspaceExperiments = (
+        workspaceId: WorkspaceId
+    ): Promise<ExperimentItem[]> =>
+        new Promise((resolve, reject) => {
+            this.ensureImpactToken()
+                .then(() => {
+                    this.axios
+                        .get(
+                            `${this.baseUrl}${this.jhUserPath}impact/api/workspaces/${workspaceId}/experiments`,
+                            {
+                                headers: {
+                                    Accept: 'application/vnd.impact.experiment.v2+json',
+                                },
+                            }
+                        )
+                        .then((result) => resolve(result.data.data.items))
+                        .catch((e) => reject(toApiError(e)))
+                })
+                .catch((e) => reject(toApiError(e)))
+        })
     getExperimentsMetaData = async ({
         workspaceId,
     }: {
